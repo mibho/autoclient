@@ -22,11 +22,147 @@ class cBotFunctionsTools(cBotTools, cBotData):
         self.popupDetected = False
         self.errorMsgFound = False
 
+    def OOG_pressAndroidTasksMenu(self):
+        self.toggleKeyCMD(keyCodes.PG_UP_KEY)
+    
+    def OOG_forceCloseMapleApp(self):
+        while self.scanThisROI(self.templateDict['msmTitleAndroidMenu'], 405,460,50,950 ,0.8, True):
+            x1 = self.matchCoords.xyLoc[0] + 80
+            y1 = self.matchCoords.xyLoc[1] + 350
+            self.sendDragCMD(keyConstants.SWIPE_UP,100, x1, y1, y1 - 250)
+            BotTools.time.sleep(1)
 
     def confirmPatchIfNeeded(self):
         if self.scanThisROI(self.templateDict['downloadwarning'],coords.PATCH_DOWNLOAD[1][0], coords.PATCH_DOWNLOAD[1][1], coords.PATCH_DOWNLOAD[0][0], coords.PATCH_DOWNLOAD[0][1], 0.8, True):
             self.sendTimedTap(coords.PATCH_CONFIRM[0][0], coords.PATCH_CONFIRM[0][1], coords.PATCH_CONFIRM[1][0], coords.PATCH_CONFIRM[1][1], keyConstants.SHORT_TAP_DURATION)
             BotTools.time.sleep(5)
+
+
+    def getCharPos(self, whichCharNum):
+        if whichCharNum == 0: return coords.LOBBY_CHAR0POS
+        elif whichCharNum == 1: return coords.LOBBY_CHAR1POS
+        elif whichCharNum == 2: return coords.LOBBY_CHAR2POS
+        elif whichCharNum == 3: return coords.LOBBY_CHAR3POS
+        elif whichCharNum == 4: return coords.LOBBY_CHAR4POS
+        elif whichCharNum == 5: return coords.LOBBY_CHAR5POS
+        elif whichCharNum == 6: return coords.LOBBY_CHAR6POS
+
+    def selectChar(self, whichCharNum):
+        BotTools.time.sleep(0.3)
+        charLoc = self.getCharPos(whichCharNum)
+        self.sendTimedTap(charLoc[0][0] + 40, charLoc[0][1] - 45, charLoc[1][0], charLoc[1][1], keyConstants.SHORT_TAP_DURATION)
+
+
+    def setTotalChars(self, num):
+        self.totalChars = num
+    
+    def updateStageNum(self, state):
+        self.gameState.stageNum = state
+    
+    def setDataGrabbedTrue(self):
+        self.dataGrabbed = True
+    
+    def returnToCharSelect(self):
+        exited = False
+        while not self.scanThisROI(self.templateDict['resetexitmenu'],108,158,409,555, 0.8, True) and not exited:
+            self.toggleKeyCMD(keyCodes.ESC_KEY)
+            BotTools.time.sleep(0.7)
+
+            if self.scanThisROI(self.templateDict['resetexitmenu'],108,158,409,555, 0.8, True):
+                BotTools.time.sleep(4)
+                self.sendTimedTap(430,537,381,417,  keyConstants.SHORT_TAP_DURATION)
+                exited = True
+    
+    
+    
+
+    def whichCharSelected(self):
+        xBound = self.matchCoords.xyLoc[0] #+ coords.LOBBY_CHARS[0][0]
+        yBound = self.matchCoords.xyLoc[1] #+ coords.LOBBY_CHARS[0][1]
+        #topleft    0
+        if xBound >= coords.LOBBY_CHAR0POS[0][0] and xBound <= coords.LOBBY_CHAR0POS[0][1] \
+            and   yBound >= coords.LOBBY_CHAR0POS[1][0] and   yBound <= coords.LOBBY_CHAR0POS[1][1]:
+            self.currChar = 0
+            print("Char 0 [top left] selected.")
+        #topmid     1
+        elif xBound >= coords.LOBBY_CHAR1POS[0][0] and xBound <= coords.LOBBY_CHAR1POS[0][1] \
+            and   yBound >= coords.LOBBY_CHAR1POS[1][0] and   yBound <= coords.LOBBY_CHAR1POS[1][1]:
+            self.currChar = 1
+            print("Char 1 [top middle] selected.") 
+        #topright   2
+        elif xBound >= coords.LOBBY_CHAR2POS[0][0] and xBound <= coords.LOBBY_CHAR2POS[0][1] \
+            and   yBound >= coords.LOBBY_CHAR2POS[1][0] and   yBound <= coords.LOBBY_CHAR2POS[1][1]:
+            self.currChar = 2
+            print("Char 2 [top right] selected.") 
+        #botleft1   3
+        elif xBound >= coords.LOBBY_CHAR3POS[0][0] and xBound <= coords.LOBBY_CHAR3POS[0][1] \
+            and   yBound >= coords.LOBBY_CHAR3POS[1][0] and   yBound <= coords.LOBBY_CHAR3POS[1][1]:
+            self.currChar = 3
+            print("Char 3 [bottom leftmost] selected.") 
+        #botleft2   4
+        elif xBound >= coords.LOBBY_CHAR4POS[0][0] and xBound <= coords.LOBBY_CHAR4POS[0][1] \
+            and   yBound >= coords.LOBBY_CHAR4POS[1][0] and   yBound <= coords.LOBBY_CHAR4POS[1][1]:
+            self.currChar = 4
+            print("Char 4 [bottom left close to the center] selected.") 
+        #botright2  5
+        elif xBound >= coords.LOBBY_CHAR5POS[0][0] and xBound <= coords.LOBBY_CHAR5POS[0][1] \
+            and   yBound >= coords.LOBBY_CHAR5POS[1][0] and   yBound <= coords.LOBBY_CHAR5POS[1][1]:
+            self.currChar = 5
+            print("Char 5 [bottom right close to the center] selected.")  
+        #botright1  6
+        elif xBound >= coords.LOBBY_CHAR6POS[0][0] and xBound <= coords.LOBBY_CHAR6POS[0][1] \
+            and   yBound >= coords.LOBBY_CHAR6POS[1][0] and   yBound <= coords.LOBBY_CHAR6POS[1][1]:
+            self.currChar = 6
+            print("Char 6 [bottom right] selected.") 
+        else:
+            print("ruh roh error")
+    
+
+    def countEmptySlots(self):
+        roi = self.grabROI(82,483,73,645)
+        count = 0
+        
+        for x in range(1,3):
+            leftLocsBot = 'botleft'
+            rightLocsBot = 'botright'
+            leftLocsTop = 'topleft'
+            rightLocsTop = 'topright'
+            if x == 1: 
+                leftLocsBot = leftLocsBot + str(x)
+                leftLocsTop = leftLocsTop + str(x)
+                rightLocsBot = rightLocsBot + str(x)
+                rightLocsTop = rightLocsTop + str(x)
+            elif x == 2:
+                leftLocsBot = leftLocsBot + str(x)
+                leftLocsTop = leftLocsTop + str(x)
+                rightLocsBot = rightLocsBot + str(x)
+
+            resLB = cv.matchTemplate(roi,self.templateDict[leftLocsBot], eval('cv.TM_CCOEFF_NORMED')) #cv.TM_CCOEFF_NORMED
+            resLT = cv.matchTemplate(roi,self.templateDict[leftLocsTop], eval('cv.TM_CCOEFF_NORMED')) #cv.TM_CCOEFF_NORMED
+            resRB = cv.matchTemplate(roi,self.templateDict[rightLocsBot], eval('cv.TM_CCOEFF_NORMED')) #cv.TM_CCOEFF_NORMED
+            if x != 2:    
+                resRT = cv.matchTemplate(roi,self.templateDict[rightLocsTop], eval('cv.TM_CCOEFF_NORMED')) #cv.TM_CCOEFF_NORMED
+
+            cv.imwrite("ok.png", roi)
+            #cv.imwrite("ok1.png", self.preClickImg)
+            #time.sleep(1)
+            if np.amax(resLT) > 0.85:
+                count += 1
+            if np.amax(resLB) > 0.85:
+                count += 1
+            if x != 2 and np.amax(resRT) > 0.85:
+                count += 1
+            if np.amax(resRB) > 0.85:
+                count += 1
+        
+        return (7 - count)
+    
+    def filterUIBlockedMatches(self, xC1, xC2, yC1, yC2):#y range 323, 515, x = 11,200
+        if not ((yC1 >= 323 and yC1 <= 515) and (yC2 >= 323 and yC2 <= 515) and \
+        (xC1 >= 11 and xC1 <= 200) and (xC2 >= 11 and xC2 <= 200)):
+            return True
+        
+        return False
 
     def closeAnyLobbyPopup(self):
         if self.scanWindow2(self.templateDict['exitpic'], 0.9) or self.scanWindow2(self.templateDict['exitpic2'], 0.9):
