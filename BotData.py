@@ -28,6 +28,7 @@ class cBotData:
             'updateReqPopup31' : cv.imread('updateReqPopup31.png', 0),
             'updateReqPopup4GooglePlay' : cv.imread('updateReqPopup4GooglePlay.png', 0),
             'updateReqPopup4GooglePlayReady' : cv.imread('updateReqPopup4GooglePlayReady.png', 0),
+            'updateReqPopup4GooglePlayReady2' : cv.imread('updateReqPopup4GooglePlayReady2.png', 0),
             'downloadwarning' : cv.imread('downloadwarning.png', 0),
             'msmstoppedmsgbox' : cv.imread('msmstoppedmsgbox.png', 0),
             

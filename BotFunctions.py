@@ -14,7 +14,7 @@ import cv2 as cv
 from BotFunctionsTools import cBotFunctionsTools
 from Constants import *
 from autodb import clientDB
-
+from ROICoords import cScanCoords as coords
 #--------------------------------------
 
 
@@ -71,7 +71,10 @@ class cBotFunctions(cBotFunctionsTools):
                         time.sleep(2)
                     elif self.scanThisROI(self.templateDict['downloadwarning'],coords.PATCH_DOWNLOAD[1][0], coords.PATCH_DOWNLOAD[1][1], coords.PATCH_DOWNLOAD[0][0], coords.PATCH_DOWNLOAD[0][1], 0.8, True):
                         self.sendTimedTap(coords.PATCH_CONFIRM[0][0], coords.PATCH_CONFIRM[0][1], coords.PATCH_CONFIRM[1][0], coords.PATCH_CONFIRM[1][1], keyConstants.SHORT_TAP_DURATION)
-
+                    
+                    #
+                    elif self.scanThisROI(self.templateDict['downloadwarning'],coords.PATCH_DOWNLOAD[1][0], coords.PATCH_DOWNLOAD[1][1], coords.PATCH_DOWNLOAD[0][0], coords.PATCH_DOWNLOAD[0][1], 0.8, True):
+                        pass
                     elif self.scanThisROI(self.templateDict['updateReqPopup'],100,165,400,550,0.8,True):
                         self.updateRequired = True
                         self.sendTimedTap(400,555, 383, 414, keyConstants.SHORT_TAP_DURATION)
@@ -84,7 +87,8 @@ class cBotFunctions(cBotFunctionsTools):
                     else:
                         if self.scanWindow2(self.templateDict['updateReqPopup4GooglePlay'], 0.8):
                             self.sendTimedTap(self.matchCoords.xyLoc[0] - 100, self.matchCoords.xyLoc[0] + 100, self.matchCoords.xyLoc[1] - 50, self.matchCoords.xyLoc[1], 0.03)
-                        elif self.scanWindow2(self.templateDict['updateReqPopup4GooglePlayReady'], 0.8):
+                        elif self.scanWindow2(self.templateDict['updateReqPopup4GooglePlayReady'], 0.8) or self.scanWindow2(self.templateDict['updateReqPopup4GooglePlayReady2'], 0.8):
+                            print("FOUND")
                             self.updateRequired = False
                             self.sendTimedTap(self.matchCoords.xyLoc[0] - 100, self.matchCoords.xyLoc[0] + 100, self.matchCoords.xyLoc[1] - 50, self.matchCoords.xyLoc[1], 0.03)
                         #(332 - 50, 332, 656 - 100,656 + 100, True)
