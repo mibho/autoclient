@@ -92,6 +92,8 @@ class cBotFunctions(cBotFunctionsTools):
                             self.updateRequired = False
                             self.sendTimedTap(self.matchCoords.xyLoc[0] - 100, self.matchCoords.xyLoc[0] + 100, self.matchCoords.xyLoc[1] - 50, self.matchCoords.xyLoc[1], 0.03)
                         #(332 - 50, 332, 656 - 100,656 + 100, True)
+            
+            elif level == stateConstants.L5_ingame:
                     
 
             
