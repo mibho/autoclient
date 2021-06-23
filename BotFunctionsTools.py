@@ -20,8 +20,13 @@ class cBotFunctionsTools(cBotTools, cBotData):
         self.afkStart = 0
         self.timerStarted = False
         self.popupDetected = False
+        self.errorMsgFound = False
 
 
+    def confirmPatchIfNeeded(self):
+        if self.scanThisROI(self.templateDict['downloadwarning'],coords.PATCH_DOWNLOAD[1][0], coords.PATCH_DOWNLOAD[1][1], coords.PATCH_DOWNLOAD[0][0], coords.PATCH_DOWNLOAD[0][1], 0.8, True):
+            self.sendTimedTap(coords.PATCH_CONFIRM[0][0], coords.PATCH_CONFIRM[0][1], coords.PATCH_CONFIRM[1][0], coords.PATCH_CONFIRM[1][1], keyConstants.SHORT_TAP_DURATION)
+            BotTools.time.sleep(5)
 
     def closeAnyLobbyPopup(self):
         if self.scanWindow2(self.templateDict['exitpic'], 0.9) or self.scanWindow2(self.templateDict['exitpic2'], 0.9):
@@ -64,7 +69,13 @@ class cBotFunctionsTools(cBotTools, cBotData):
     def checkStage(self):
         screen = self.returnColorSS(False)
         homeStage = cv.matchTemplate(screen, self.templateDict['SCHK_0atHomeScreen'], eval('cv.TM_CCOEFF_NORMED'))
-        if np.amax(homeStage) > self.DEFAULT_THRESHOLD:
+        crashMsg = cv.matchTemplate(screen, self.templateDict['msmstoppedmsgbox'], eval('cv.TM_CCOEFF_NORMED'))
+        if np.amax(crashMsg > self.DEFAULT_THRESHOLD):
+            self.errorMsgFound = True
+        else:
+            self.errorMsgFound = False
+
+        if np.amax(homeStage) > self.DEFAULT_THRESHOLD or np.amax(crashMsg) > self.DEFAULT_THRESHOLD:
             self.gameState.toggleOtherStatesOff(stateConstants.L0_at_home_scr)
         else: #not home screen so in game or buggd
             if not (self.gameState.currState[stateConstants.L5_ingame]):
@@ -122,7 +133,7 @@ class cBotFunctionsTools(cBotTools, cBotData):
                 if exitBannerVisible: 
                     self.gameState.toggleOtherStatesOff(stateConstants.L1_at_start_ban)
                     self.gameState.atLobby = False
-                                    
+
                 elif stageTitleRegionVisible and stageTitleMSNameVisible and (stageTitleServerIconVisible or stageTitleCharDetectedVisible): #at titlescreen LOADED #how we know if title is loaded?
                     self.gameState.toggleOtherStatesOff(stateConstants.L2_at_title_screen)
                     self.gameState.atLobby = False

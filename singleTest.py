@@ -26,10 +26,12 @@ if __name__ == '__main__':
     #test.getTemplate(280,320,655, 750)
     #if test.freeABTaken():
     #test.OOG_pressAndroidTasksMenu()
-    #if test.scanThisROI(test.templateDict['msmTitleAndroidMenu'], 405,460,50,950 ,0.8, True):
+    #if test.scanThisROI(test.templateDict['updateReqPopup2'], 110,200,195,600 ,0.8, True):
+    #if test.scanThisROI(test.templateDict['updateReqPopup3'], 110,420,195,775 ,0.8, True):
+    
     #    print(test.matchCoords.xyLoc[1] + 405)
     #    test.OOG_forceCloseMapleApp()#[self.adjustYoffset(125):self.adjustYoffset(155), 250:670]screen[self.adjustYoffset(48):self.adjustYoffset(98), 675:720]
-    test.getTemplate(48,98,675,720, False)
+    #test.getTemplate(327 - 50, 327, 641 - 100,641 + 100, True)
     test.botLoop(0, True)
         
     #while 1:

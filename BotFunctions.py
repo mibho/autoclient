@@ -39,6 +39,9 @@ class cBotFunctions(cBotFunctionsTools):
             level = self.gameState.returnStageNum()
             self.gameState.printTest()
             if level == stateConstants.L0_at_home_scr:
+                if self.errorMsgFound:
+                    print("Error lol")
+                    #send touch. 
                 if self.scanThisROI(self.templateDict['SCHK_0atHomeScreen'],0,457, 0, 865, 0.8, True):
                     print("MSM located! opening...")
                     self.sendTimedTap(self.matchCoords.xyLoc[0] + 5, self.matchCoords.xyLoc[0] + 20, self.matchCoords.xyLoc[1] - 45, self.matchCoords.xyLoc[1] - 30, 0.03)
@@ -66,11 +69,26 @@ class cBotFunctions(cBotFunctionsTools):
                     if self.scanThisROI(self.templateDict['SCHK_1exitbanner'],2,52,900,960,0.8,True):
                         self.sendTimedTap(919,949, 10, 41, keyConstants.SHORT_TAP_DURATION)
                         time.sleep(2)
+                    elif self.scanThisROI(self.templateDict['downloadwarning'],coords.PATCH_DOWNLOAD[1][0], coords.PATCH_DOWNLOAD[1][1], coords.PATCH_DOWNLOAD[0][0], coords.PATCH_DOWNLOAD[0][1], 0.8, True):
+                        self.sendTimedTap(coords.PATCH_CONFIRM[0][0], coords.PATCH_CONFIRM[0][1], coords.PATCH_CONFIRM[1][0], coords.PATCH_CONFIRM[1][1], keyConstants.SHORT_TAP_DURATION)
+
                     elif self.scanThisROI(self.templateDict['updateReqPopup'],100,165,400,550,0.8,True):
                         self.updateRequired = True
                         self.sendTimedTap(400,555, 383, 414, keyConstants.SHORT_TAP_DURATION)
                 else:
-                    pass
+                    if self.scanThisROI(self.templateDict['updateReqPopup2'], 110,200,195,600 ,0.8, True):
+                        if self.scanThisROI(self.templateDict['updateReqPopup3'], 110,420,195,775 ,0.8, True):
+                            self.sendTimedTap(self.matchCoords.xyLoc[0] + 195, self.matchCoords.xyLoc[0] + 500, self.matchCoords.xyLoc[1] + 110, self.matchCoords.xyLoc[1] + 200, 0.03)
+                            time.sleep(1)
+                            self.sendTimedTap(222, 450, 360, 410, 0.05)
+                    else:
+                        if self.scanWindow2(self.templateDict['updateReqPopup4GooglePlay'], 0.8):
+                            self.sendTimedTap(self.matchCoords.xyLoc[0] - 100, self.matchCoords.xyLoc[0] + 100, self.matchCoords.xyLoc[1] - 50, self.matchCoords.xyLoc[1], 0.03)
+                        elif self.scanWindow2(self.templateDict['updateReqPopup4GooglePlayReady'], 0.8):
+                            self.updateRequired = False
+                            self.sendTimedTap(self.matchCoords.xyLoc[0] - 100, self.matchCoords.xyLoc[0] + 100, self.matchCoords.xyLoc[1] - 50, self.matchCoords.xyLoc[1], 0.03)
+                        #(332 - 50, 332, 656 - 100,656 + 100, True)
+                    
 
             
         

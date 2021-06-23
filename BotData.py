@@ -23,6 +23,14 @@ class cBotData:
             'bannerexit2' : cv.imread('bannerexit2.png', 0),  
 
             'updateReqPopup' : cv.imread('updateReqPopup.png', 0), #400-550 x 100-165 y
+            'updateReqPopup2' : cv.imread('updateReqPopup2.png', 0),
+            'updateReqPopup3' : cv.imread('updateReqPopup3.png', 0),
+            'updateReqPopup31' : cv.imread('updateReqPopup31.png', 0),
+            'updateReqPopup4GooglePlay' : cv.imread('updateReqPopup4GooglePlay.png', 0),
+            'updateReqPopup4GooglePlayReady' : cv.imread('updateReqPopup4GooglePlayReady.png', 0),
+            'downloadwarning' : cv.imread('downloadwarning.png', 0),
+            'msmstoppedmsgbox' : cv.imread('msmstoppedmsgbox.png', 0),
+            
 
             #checkForPopups() function template files
             'revivebtn'   : cv.imread('revivebtn.png', 0),  
