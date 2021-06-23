@@ -129,13 +129,14 @@ class cBotFunctionsTools(cBotTools, cBotData):
                     self.gameState.toggleOtherStatesOff(stateConstants.L3_load_entering_game)
                     if self.gameState.startPressed:
                         self.gameState.toggleOtherStatesOff(stateConstants.L5_ingame)
-                    elif self.gameState.goingBackToLobby:
-                        self.gameState.toggleOtherStatesOff(stateConstants.L4_at_char_lobby)                
+                    #elif self.gameState.goingBackToLobby:
+                    #    self.gameState.toggleOtherStatesOff(stateConstants.L4_at_char_lobby)                
                 
                 
                 elif charStartPageVisible:
                     self.gameState.toggleOtherStatesOff(stateConstants.L4_at_char_lobby)
                 else:
+                    
                         self.gameState.toggleOtherStatesOff(stateConstants.L16_loading_wait)
                     #if start button was pressed then we going in game
             
