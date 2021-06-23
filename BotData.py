@@ -22,6 +22,7 @@ class cBotData:
             'SCHK_40charStart' : cv.imread('SCHK_40charStart.png', 0),  
             'bannerexit2' : cv.imread('bannerexit2.png', 0),  
 
+            #template files for update/download stage
             'updateReqPopup' : cv.imread('updateReqPopup.png', 0), #400-550 x 100-165 y
             'updateReqPopup2' : cv.imread('updateReqPopup2.png', 0),
             'updateReqPopup3' : cv.imread('updateReqPopup3.png', 0),
