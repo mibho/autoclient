@@ -160,41 +160,55 @@ class cBotFunctionsTools(cBotTools, cBotData):
         resMapleView = cv.matchTemplate(roiMapleView, self.templateDict['mapleviewpopup'], eval('cv.TM_CCOEFF_NORMED'))
         resAds1 = cv.matchTemplate(roiRandAds ,self.templateDict['exitpic'], eval('cv.TM_CCOEFF_NORMED'))
         resAds2 = cv.matchTemplate(roiRandAds ,self.templateDict['exitpic2'], eval('cv.TM_CCOEFF_NORMED'))
-        resAds3 = cv.matchTemplate(roiRandAds ,self.templateDict['newmenuexit'], eval('cv.TM_CCOEFF_NORMED'))
-        resAds4 = cv.matchTemplate(roiRandAds ,self.templateDict['adexit3'], eval('cv.TM_CCOEFF_NORMED'))
+        
+        resAds3 = cv.matchTemplate(roiRandAds ,self.templateDict['adexit3'], eval('cv.TM_CCOEFF_NORMED'))
+
+        resExit1 = cv.matchTemplate(roiRandAds ,self.templateDict['newmenuexit'], eval('cv.TM_CCOEFF_NORMED'))
+        resExit2 = cv.matchTemplate(roiRandAds ,self.templateDict['newmenuexit2'], eval('cv.TM_CCOEFF_NORMED'))
+
         resNewConfirm = cv.matchTemplate(roiNewConfirm ,self.templateDict['newcontentconfirm'], eval('cv.TM_CCOEFF_NORMED'))
         resVioletta = cv.matchTemplate(roiVioletta ,self.templateDict['violettabotpopup'], eval('cv.TM_CCOEFF_NORMED'))
         resNewForced = cv.matchTemplate(roiNewForced ,self.templateDict['newtuticon'], eval('cv.TM_CCOEFF_NORMED'))
               
-
-
-        threshold = 0.8
         if np.amax(resRev) > self.DEFAULT_THRESHOLD:
             self.gameState.updateStatus(stateConstants.S20_isdead, True)
             print("we dead")
         
-        elif (np.amax(resAds1) > self.DEFAULT_THRESHOLD or np.amax(resAds2) > self.DEFAULT_THRESHOLD or np.amax(resAds3) > self.DEFAULT_THRESHOLD or np.amax(resAds4) > self.DEFAULT_THRESHOLD) and \
+        elif (np.amax(resAds1) > self.DEFAULT_THRESHOLD or np.amax(resAds2) > self.DEFAULT_THRESHOLD or np.amax(resAds3) > self.DEFAULT_THRESHOLD or np.amax(resExit1) > self.DEFAULT_THRESHOLD or np.amax(resExit2) > self.DEFAULT_THRESHOLD) and \
             (not self.gameState.currState[stateConstants.S24_in_dialog] and not self.gameState.currState[stateConstants.S27_in_bag] and not self.gameState.currState[stateConstants.S28_in_mailbox]):
+            print("closeable popup detected!")
+
             if np.amax(resAds1) > self.DEFAULT_THRESHOLD:
                 res = resAds1 
+                print("exitpic [resAds1] detected")
             elif np.amax(resAds2) > self.DEFAULT_THRESHOLD:
                 res = resAds2
+                print("exitpic2 [resAds2] detected")
             elif np.amax(resAds3) > self.DEFAULT_THRESHOLD:
                 res = resAds3
-            else:
-                res = resAds4
+                print("adexit3 [resAds3] detected")
+            elif np.amax(resExit1) > self.DEFAULT_THRESHOLD:
+                res = resExit1
+                print("newmenuexit [resExit1] detected")
+            elif np.amax(resExit2) > self.DEFAULT_THRESHOLD:
+                res = resExit2
+                print("newmenuexit2 [resExit2] detected")
+            
             loc = np.where( res >= self.DEFAULT_THRESHOLD)
             for pt in zip(*loc[::-1]):
                 self.matchCoords.setPoints(pt[0], pt[1])   
 
-            print("popup visible")
+            
             self.gameState.updateStatus(stateConstants.S22_popup_visible, True)
         elif np.amax(resNewForced) > self.DEFAULT_THRESHOLD: #and self.gameState.buttonPressed:
             self.gameState.updateStatus(stateConstants.S30_new_forced_visible, True)
             print("new forced tut visible")
+        elif np.amax(resNewConfirm) > self.DEFAULT_THRESHOLD: #and self.gameState.buttonPressed:
+            self.gameState.updateStatus(stateConstants.S31_new_confirm_popup, True)
+            print("new confirm popup detected")
         elif np.amax(resMapleView) > self.DEFAULT_THRESHOLD:
             self.gameState.updateStatus(stateConstants.S32_mapleview_visible, True)
-            print("WEE WOO WEE WOO NOT GOOD")
+            print("Mapleview popup detected!")
             
         elif np.amax(resVioletta) > self.DEFAULT_THRESHOLD:
             self.gameState.updateStatus(stateConstants.S33_violetta, True)
