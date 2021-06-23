@@ -121,22 +121,26 @@ class cBotFunctionsTools(cBotTools, cBotData):
             
                 if exitBannerVisible: 
                     self.gameState.toggleOtherStatesOff(stateConstants.L1_at_start_ban)
-                
+                    self.gameState.atLobby = False
+                                    
                 elif stageTitleRegionVisible and stageTitleMSNameVisible and (stageTitleServerIconVisible or stageTitleCharDetectedVisible): #at titlescreen LOADED #how we know if title is loaded?
                     self.gameState.toggleOtherStatesOff(stateConstants.L2_at_title_screen)
+                    self.gameState.atLobby = False
             
                 elif loadingPageVisible and not (stageTitleServerIconVisible or stageTitleRegionVisible):
                     self.gameState.toggleOtherStatesOff(stateConstants.L3_load_entering_game)
                     if self.gameState.startPressed:
                         self.gameState.toggleOtherStatesOff(stateConstants.L5_ingame)
+                    self.gameState.atLobby = False
                     #elif self.gameState.goingBackToLobby:
                     #    self.gameState.toggleOtherStatesOff(stateConstants.L4_at_char_lobby)                
                 
                 
                 elif charStartPageVisible:
+                    self.gameState.atLobby = True
                     self.gameState.toggleOtherStatesOff(stateConstants.L4_at_char_lobby)
                 else:
-                    
+                    if not self.gameState.atLobby:
                         self.gameState.toggleOtherStatesOff(stateConstants.L16_loading_wait)
                     #if start button was pressed then we going in game
             

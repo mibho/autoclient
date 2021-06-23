@@ -58,8 +58,7 @@ class cBotFunctions(cBotFunctionsTools):
             elif level == stateConstants.L3_load_entering_game:
                 self.closeAnyLobbyPopup()
             elif level == stateConstants.L4_at_char_lobby:
-                if not self.gameState.atLobby:
-                    self.gameState.atLobby = True
+    
                 self.closeAnyLobbyPopup()
                 print("at lvl 4 now baybee")
             elif level == stateConstants.L16_loading_wait:
