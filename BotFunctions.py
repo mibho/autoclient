@@ -61,6 +61,7 @@ class cBotFunctions(cBotFunctionsTools):
             elif level == stateConstants.L3_load_entering_game:
                 self.closeAnyLobbyPopup()
             elif level == stateConstants.L4_at_char_lobby:
+                #check table exists.
     
                 self.closeAnyLobbyPopup()
                 print("at lvl 4 now baybee")
@@ -94,6 +95,7 @@ class cBotFunctions(cBotFunctionsTools):
                         #(332 - 50, 332, 656 - 100,656 + 100, True)
             
             elif level == stateConstants.L5_ingame:
+                pass
                     
 
             
