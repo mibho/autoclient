@@ -32,7 +32,12 @@ if __name__ == '__main__':
     #    print(test.matchCoords.xyLoc[1] + 405)
     #    test.OOG_forceCloseMapleApp()#[self.adjustYoffset(125):self.adjustYoffset(155), 250:670]screen[self.adjustYoffset(48):self.adjustYoffset(98), 675:720]
     #test.getTemplate(327 - 50, 327, 641 - 100,641 + 100, True)
-    test.botLoop(0, True)
+    #test.botLoop(0, True)
+    #test.getTemplate(263,288,290,337, False) x 208-450  145-370 y 
+    test.checkKickSave()
+    test.getTemplate(368,410,728,765, True)#263,288,295,309, False)
+    test.currAmtAB()
+    #test.dbConn.updateSingleVar("MAIN_TBL_CLIENTS", "accDataRegistered", (1,))
         
     #while 1:
         #if (test.findTemplateMatch2(test.templateDict['questbulb'], 0.85) or test.findTemplateMatch2(test.templateDict['questbookicon'], 0.85)):

@@ -12,6 +12,7 @@ If the resulting table is empty then your_table_name doesn't exist.
 class clientDB:
     UTC_7_TZ = "America/Los Angeles"
     UTC_8_TZ = "America/Juneau"
+    CHAR_TBL_TITLE = "charTable"
     #CREATE_MAIN_TABLE_CMD = "CREATE TABLE IF NOT EXISTS MAIN_CLI_TBL (clientID INTEGER PRIMARY KEY, clientName TEXT NOT NULL, botLastOpened timestamp);"
     #CREATE_CLIENT_CHAR_TABLE_CMD =  "CREATE TABLE IF NOT EXISTS " + tableName + " (clientID INTEGER PRIMARY KEY, clientName TEXT NOT NULL, botLastOpened timestamp);"
 
@@ -19,12 +20,14 @@ class clientDB:
         self.noxNum = noxClientID + 1
         self.clientName = winName
         self.connectToDB(dbFileName)
-        self.initTables()
+        self.initMainTable()
         self.dailyReset = False
         self.reobtainCharInfo = False #have this be like a checkbox setting; enabled if user clicks button or something for gui pt later...
         self.checkIfDataRegistered(self.noxNum)
         #self.getNumberOfEntries()
-        #self.resetDailyStatus()
+        self.resetDailyStatus()
+        self.registerClientInMain()
+        print("apsted")
 
     
     def connectToDB(self, dbFileName):
@@ -35,8 +38,6 @@ class clientDB:
     
 
     def executeCMD(self, *args):
-        print("this being run: ")
-        print(args)
         if len(args) == 0:
             return
 
@@ -70,7 +71,7 @@ class clientDB:
 
         return (self.sqlCursor.fetchone() is not None)
 
-    def createTableIfDNE(self, *args):
+    def createTableIfDNE(self, *args): #args[0] = tbl_name, args[1] = column contents of tbl
         sqlCMD = "CREATE TABLE IF NOT EXISTS "+ args[0] + " (" + args[1] + ");"
         self.executeCMD(sqlCMD)
     
@@ -79,7 +80,10 @@ class clientDB:
         sqlCMD = "SELECT * FROM sqlite_master where type='table'"
         self.executeCMD(sqlCMD)
         for tbl in self.sqlCursor.fetchall():
+            if self.checkIfDataRegistered(self.noxNum) == 1:
+                
             print(tbl)
+            print("1")
         print("EXITED RESETDAILY")
     
     def verifyValidTable(self, tableName):
@@ -89,6 +93,16 @@ class clientDB:
                 #since we verified it is valid table, trust that accdata was registered and tbl has data regarding chars that we can now reset.
         
         return False
+    
+
+    def getSingleValAccData(self, colName, cID):
+        table = self.CHAR_TBL_TITLE + str(self.noxNum)
+        sqlCMD = "SELECT " + colName + " FROM " + table + " where charNum " + "= ?"
+        self.executeCMD(sqlCMD, str(cID))
+
+                                        #  0        1               2               3                   4               5               6           7           8
+    def createClientAccDataTable(self, clientTitle): #char# | jobs done? | ed tix take? | daily dung done? | elite dung done? | netts dung done? | ab taken? | can take AB | TY done
+        self.createTableIfDNE(clientTitle, "charNum INTEGER PRIMARY KEY, charDone INTEGER, extraEDTixTaken INTEGER, dailyDungDone INTEGER, eliteDungDone INTEGER, nettsDungDone INTEGER, dailyABTaken INTEGER, dailyABAvail INTEGER, cookDungDone INTEGER")
 
     def getNumOfClientsRegistered(self):
         sqlCMD = "SELECT * FROM MAIN_TBL_CLIENTS"
@@ -96,7 +110,10 @@ class clientDB:
         print(len(self.sqlCursor.fetchall()))
         print("TOTAL")
 
-    
+    def registerClientAccData(self,charNum):
+        table = self.CHAR_TBL_TITLE + str(self.noxNum)
+        data_tuple = (charNum, 0, 0, 0, 0, 0, 0, 0, 0)
+        self.insertOrUpdateMultiple(table,"(charNum, charDone, extraEDTixTaken, dailyDungDone, eliteDungDone, nettsDungDone, dailyABTaken, dailyABAvail, cookDungDone )", data_tuple)
     #return -1 if entry DNE, ie, current clientID isn't even in main table... otherwise return 0 or 1.
     #                                                                         returns 0 by default [not registered], 1 if we obtained acc data via char lobby already.
     def checkIfDataRegistered(self, cID):
@@ -107,42 +124,38 @@ class clientDB:
         else:
             return registered[0]
     
-    def setup(self):
+    def checkSetup(self):
         state = self.checkIfDataRegistered(self.noxNum)
+        if state != -1:
+            return state
+        else:
+            return -1
+        '''
         if state == 1:
             print("it registered")
         elif state == 0: 
             print("not registered but client info was recognized. jst need to read during char lobby now...")
         elif state == -1:
             print("doesnt exist")
+        '''
     
     '''
     if accData is registered, then either 1) table for client exists or 2) doesnt
     if NOT registered (0), then clearly the
 
     '''
+    def registerClientInMain(self):
+        timeData = datetime.datetime.now(tz=pytz.timezone(self.UTC_8_TZ))
+        data_tuple = (self.noxNum, self.clientName, timeData, 0, 0)
+        self.insertOrUpdateMultiple("MAIN_TBL_CLIENTS","(clientID, clientName, botLastOpened, accDataRegistered, jobsFinished)", data_tuple)
 
-
-    def initTables(self):
+    def initMainTable(self):
         if not self.doesTableExist("MAIN_TBL_CLIENTS"): #creates main table if DNE
             self.createTableIfDNE("MAIN_TBL_CLIENTS", "clientID INTEGER PRIMARY KEY,clientName TEXT NOT NULL, botLastOpened timestamp,accDataRegistered INTEGER,jobsFinished INTEGER")
-
-        else:
-            timeData = datetime.datetime.now(tz=pytz.timezone(self.UTC_8_TZ))
-        
-            if self.doesTableExist("MAIN_TBL_CLIENTS"): #clientID registered, make changes to windowname as needed
-                print("REGISTERED YAYAYA")
-                self.updateNameIfNeeded(self.noxNum)
-                data_tuple = (self.noxNum, self.clientName, timeData, "1")
-                self.insertOrUpdateMultiple("MAIN_TBL_CLIENTS","(clientID, clientName, botLastOpened, accDataRegistered)", data_tuple, 1)
-                #self.insertOrUpdateTable("MAIN_TBL_CLIENTS","accDataRegistered", "1")
-                #self.updateSingleVar("MAIN_TBL_CLIENTS", "jobsFinished", "0")
-                self.updateSingleVar("MAIN_TBL_CLIENTS", "botLastOpened", (timeData,))
-                #self.insertOrUpdateMultiple("MAIN_TBL_CLIENTS", "botLastOpened", timeData, 0)
-                print("aasd done")
-            
+            self.registerClientInMain()
+        else: #main tbl exists already 
             pass
-        #now check if clientID registered:
+
     
 
     def updateStoredWindowName(self, tableName, windowName):

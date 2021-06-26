@@ -30,6 +30,7 @@ class cBotTools:
 
         self.hwnd = processTools.getHWNDFromTitle(windowName)
         self.device = deviceObj#.device(adbSockInfo)
+        self.cNum = clientNum + 1
         
         self.matchCoords = Coords.cCoords(0,0)
 

@@ -22,17 +22,42 @@ from ROICoords import cScanCoords as coords
 #class cBotFunctions(c cBotData):
 class cBotFunctions(cBotFunctionsTools):
     def __init__(self, pID, windowName, clientNum, deviceObj, adbSockInfo):
+        
         cBotFunctionsTools.__init__(self, pID, windowName, clientNum, deviceObj, adbSockInfo)
         print("loading..")
+        
         self.dbConn = clientDB("autoTest.db", windowName, clientNum)
-        print("successfully passed clientDB obj creation!")
+        print("DB File created or already exists. loading..")
+        self.startPressed = False
         self.updateRequired = False
         self.patchSuccess = False
+        self.inputAccData = False
+        self.dbDataCheck()
     
+    def dbDataCheck(self):
+        tblName = self.dbConn.CHAR_TBL_TITLE + str(self.cNum)
+
+        if self.dbConn.checkSetup() == 0: #need to register accData. 1st check if client table exists..
+            
+            if not self.dbConn.doesTableExist(tblName):
+                self.dbConn.createClientAccDataTable(tblName)
+            self.inputAccData = True
+                
+        elif self.dbConn.checkSetup() == -1: #row not registered so... 
+            self.dbConn.registerClientInMain()
+            self.dbConn.createClientAccDataTable(tblName)
+            self.inputAccData = True
+        else: #good to go
+            if not self.dbConn.verifyValidTable(tblName):
+                print("OH NO SOMETHING BIG WRONG BIG BIG WRONG")
+                print("HELP!")
+                print("---------------------------------------")
+
     def update():
         pass
-    
+
     def botLoop(self, whichFeature, enabled):
+        firstrun = True
         while enabled:
             time.sleep(1)
             #load data from db
@@ -61,6 +86,38 @@ class cBotFunctions(cBotFunctionsTools):
             elif level == stateConstants.L3_load_entering_game:
                 self.closeAnyLobbyPopup()
             elif level == stateConstants.L4_at_char_lobby:
+
+                if self.inputAccData:
+                    done = False
+                    while not done:
+                        self.closeAnyLobbyPopup()
+                        if self.gameState.returnStageNum() == stateConstants.L4_at_char_lobby:
+                            charAmt = self.countEmptySlots()
+                            for x in range(0, charAmt):
+                                self.dbConn.registerClientAccData(x)
+                            self.dbConn.updateSingleVar("MAIN_TBL_CLIENTS", "accDataRegistered", (1,) )
+                            done = True
+                            self.inputAccData = False
+                else:
+                    self.findSelectedChar()
+                    if firstrun and self.currChar != 0:
+                        self.selectChar(0)
+                        self.findSelectedChar()
+                        if self.currChar == 0:
+                            firstrun = False
+                    elif firstrun and self.currChar == 0:
+                        firstrun = False
+                    
+                    if not firstrun:
+                        if self.dbConn.getSingleValAccData("charDone", self.currChar):
+                            self.selectChar(self.currChar + 1)
+                        else:
+                            if self.gameState.returnStageNum() == stateConstants.L4_at_char_lobby:
+                                print("no popup detected! going in game")
+                                self.sendTimedTap(707,899,445,479, keyConstants.SHORT_TAP_DURATION)
+                                self.gameState.startPressed = True
+                                time.sleep(2)
+
                 #check table exists.
     
                 self.closeAnyLobbyPopup()
@@ -95,6 +152,15 @@ class cBotFunctions(cBotFunctionsTools):
                         #(332 - 50, 332, 656 - 100,656 + 100, True)
             
             elif level == stateConstants.L5_ingame:
+                self.gameState.atLobby = False
+                if self.gameState.currState[stateConstants.L13_auto_quest]:
+                    while self.gameState.currState[stateConstants.L13_auto_quest]:
+                        pass
+                        '''
+                        check level
+                        '''
+
+
                 pass
                     
 
