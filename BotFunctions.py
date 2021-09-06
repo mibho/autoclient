@@ -30,6 +30,7 @@ class cBotFunctions(cBotFunctionsTools):
         print("DB File created or already exists. loading..")
         self.startPressed = False
         self.updateRequired = False
+        self.gplayPressedPlayed = False
         self.patchSuccess = False
         self.inputAccData = False
         self.dbDataCheck()
@@ -52,9 +53,106 @@ class cBotFunctions(cBotFunctionsTools):
                 print("OH NO SOMETHING BIG WRONG BIG BIG WRONG")
                 print("HELP!")
                 print("---------------------------------------")
+    
+    def initFameDB(self):
+        if not self.dbConn.doesTableExist("fameTable"):
+            self.dbConn.createTableIfDNE("fameTable")
+            # get char names from user input in pyqt (user enters 10 names, those are read in. store data after)
+        else:
+            pass
+            # tbl exists so go thru tbl and fame
+            
 
     def update():
         pass
+
+    def startAQ(self):
+        pass
+
+    
+
+    def doFame(self, charName, preSS, postSS):
+        jobDone = False
+        if self.scanThisROI(self.templateDict['searchplayersbtn'],480, 517, 135,238, 0.8, False) and not self.scanThisROI(self.templateDict['searchplayersbox'],110, 153, 390,570, 0.8, False):
+            self.sendTimedTap(146,226, 485, 510,  keyConstants.SHORT_TAP_DURATION)
+            time.sleep(2)
+        if self.scanThisROI(self.templateDict['searchplayersbox'],110, 153, 390,570, 0.8, False):
+            if self.scanThisROI(self.templateDict['emptynamebox'],280, 310, 365,590, 0.8, False):
+                self.sendTimedTap(370,580, 290, 305, keyConstants.SHORT_TAP_DURATION)
+                time.sleep(1)
+                self.enterText(charName)
+                time.sleep(2.5)
+        print("y")
+        if not self.scanThisROI(self.templateDict['emptynamebox'],289, 305, 455,485, 0.8, False):
+            print("a")
+            while not self.scanThisROI(self.templateDict['emptynamebox'],289, 305, 455,485, 0.8, False) and self.scanThisROI(self.templateDict['confirmbtn'],380, 415, 530,655, 0.8, False):
+                print("s")
+                self.sendTimedTap(525,640, 383, 414, keyConstants.SHORT_TAP_DURATION)
+                time.sleep(2)
+        if self.scanThisROI(self.templateDict['searchresults'],115, 152, 431,600, 0.8, False):
+            self.sendTimedTap(280,400, 220, 315, keyConstants.SHORT_TAP_DURATION)
+            time.sleep(2)
+        
+        if self.checkIfRightSubMenu('playerinfopage'):
+            time.sleep(2)
+            #self.saveImageAs(65,460,620,950, 1, preSS)
+            while not self.fameIsUsed():
+                self.sendTimedTap(645,660,85, 105, keyConstants.SHORT_TAP_DURATION)
+                time.sleep(2)
+            if self.fameIsUsed():
+                #self.saveImageAs(65,460,620,950, 1, postSS)
+                jobDone = True
+                print("done")
+                #self.returnToCharSelect()
+    
+    def fameLoop(self, charName1, ss1, ss2):
+        done = False
+        self.openInGameMenu()
+        if self.checkIfInMenu():
+            self.enterSubMenu('communityicon')
+            time.sleep(2)
+        if self.checkIfRightSubMenu('communitypage'):
+            done = self.doFame(charName1, ss1, ss2)
+        if self.checkIfRightSubMenu('playerinfopage'):
+            time.sleep(2)
+            #self.saveImageAs(65,460,620,950, 1, ss1)
+            while not self.fameIsUsed():
+                self.sendTimedTap(645,660,85, 105, keyConstants.SHORT_TAP_DURATION)
+                time.sleep(2)
+            if self.fameIsUsed():
+                #self.saveImageAs(65,460,620,950, 1, ss2)
+                done = True
+                print("done")
+                #self.returnToCharSelect()
+
+        
+        return done
+
+    #fameList consist of list of strings (names of chars)
+    def startFame(self, fameList):
+        #get name data from DB [separate table]
+        #each char should have own tbl keeping track of which chars successfully famed.
+        timestamp = time.strftime('_%H_%M_%S_')
+
+        ssName1 = "preFame" + timestamp 
+        ssName2 = "postFame" + timestamp  
+        if self.fameLoop("Meowkins", ssName1, ssName2):
+            famed = True
+        
+        if famed:
+            print("famed, switching chars")
+            self.returnToCharSelect()
+            self.updateStageNum(stateConstants.L4_at_char_lobby)
+            atLevel = stateConstants.L4_at_char_lobby
+            self.gameState.updateStatus(stateConstants.L13_auto_quest, False)
+            self.gameState.goingBackToLobby = True
+            someVal += 1
+            famed = False
+    
+
+    
+
+
 
     def botLoop(self, whichFeature, enabled):
         firstrun = True
@@ -64,6 +162,7 @@ class cBotFunctions(cBotFunctionsTools):
             level = self.gameState.returnStageNum()
             self.gameState.printTest()
             if level == stateConstants.L0_at_home_scr:
+                print("level 0")
                 if self.errorMsgFound:
                     print("Error lol")
                     #send touch. 
@@ -73,19 +172,23 @@ class cBotFunctions(cBotFunctionsTools):
                     if self.gameState.crashed:
                         self.gameState.resetOnCrash()
             elif level == stateConstants.L1_at_start_ban:
+                print("level 1")
                 self.patchSuccess = True
                 if self.scanThisROI(self.templateDict['bannerexit2'],2,52,900,960,0.8,True):
                     self.sendTimedTap(919,949, 10, 41, keyConstants.SHORT_TAP_DURATION)
                     print("sent CMD, banner should be closing...")
             elif level == stateConstants.L2_at_title_screen:
+                print("level 2")
                 #roiLoading = screen[self.adjustYoffset(48):self.adjustYoffset(98), 675:720]
                 if not self.scanThisROI(self.templateDict['SCHK_30loadingPage'], 48,98,685,735, 0.8, False):
                     self.sendTimedTap(183, 940, 28, 460, keyConstants.SHORT_TAP_DURATION)
                     time.sleep(3)
                     print("sent CMD, should pass title screen")
             elif level == stateConstants.L3_load_entering_game:
+                print("level 3")
                 self.closeAnyLobbyPopup()
             elif level == stateConstants.L4_at_char_lobby:
+                print("level 4")
 
                 if self.inputAccData:
                     done = False
@@ -123,7 +226,13 @@ class cBotFunctions(cBotFunctionsTools):
                 self.closeAnyLobbyPopup()
                 print("at lvl 4 now baybee")
             elif level == stateConstants.L16_loading_wait:
+                print("level 16")
                 if not self.updateRequired:
+
+                    #if self.gplayPressedPlayed:
+                    #    if self.scanWindow2(self.templateDict['updateReqPopup4GooglePlayReady'], 0.8) or self.scanWindow2(self.templateDict['updateReqPopup4GooglePlayReady2'], 0.8):
+                    #        print("CRASHED BUT IT'S OK. RE-PRESSING PLAY.")
+
                     if self.scanThisROI(self.templateDict['SCHK_1exitbanner'],2,52,900,960,0.8,True):
                         self.sendTimedTap(919,949, 10, 41, keyConstants.SHORT_TAP_DURATION)
                         time.sleep(2)
@@ -148,6 +257,7 @@ class cBotFunctions(cBotFunctionsTools):
                         elif self.scanWindow2(self.templateDict['updateReqPopup4GooglePlayReady'], 0.8) or self.scanWindow2(self.templateDict['updateReqPopup4GooglePlayReady2'], 0.8):
                             print("FOUND")
                             self.updateRequired = False
+                            self.gplayPressedPlayed = True
                             self.sendTimedTap(self.matchCoords.xyLoc[0] - 100, self.matchCoords.xyLoc[0] + 100, self.matchCoords.xyLoc[1] - 50, self.matchCoords.xyLoc[1], 0.03)
                         #(332 - 50, 332, 656 - 100,656 + 100, True)
             

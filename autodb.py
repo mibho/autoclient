@@ -81,7 +81,7 @@ class clientDB:
         self.executeCMD(sqlCMD)
         for tbl in self.sqlCursor.fetchall():
             if self.checkIfDataRegistered(self.noxNum) == 1:
-                
+                print("line 84")
             print(tbl)
             print("1")
         print("EXITED RESETDAILY")
@@ -130,14 +130,6 @@ class clientDB:
             return state
         else:
             return -1
-        '''
-        if state == 1:
-            print("it registered")
-        elif state == 0: 
-            print("not registered but client info was recognized. jst need to read during char lobby now...")
-        elif state == -1:
-            print("doesnt exist")
-        '''
     
     '''
     if accData is registered, then either 1) table for client exists or 2) doesnt

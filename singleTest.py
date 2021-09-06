@@ -20,23 +20,30 @@ if __name__ == '__main__':
     test = AutoClient.cBotFunctions( n_mgr.detectedDevicesADBList[key][0], n_mgr.detectedDevicesADBList[key][1], \
                                             n_mgr.detectedDevicesADBList[key][2], n_mgr.adbConnectedDevs[key], "lol")
             
+    
+    #test.getInputDeviceID()
     #while 1:
     #    test.charSelectTest()
     #    AutoClient.time.sleep(0.5)
-    #test.getTemplate(280,320,655, 750)
+    #test.closePlayStoreReview()
     #if test.freeABTaken():
     #test.OOG_pressAndroidTasksMenu()
     #if test.scanThisROI(test.templateDict['updateReqPopup2'], 110,200,195,600 ,0.8, True):
     #if test.scanThisROI(test.templateDict['updateReqPopup3'], 110,420,195,775 ,0.8, True):
-    
+    #test.findSelectedChar
     #    print(test.matchCoords.xyLoc[1] + 405)
     #    test.OOG_forceCloseMapleApp()#[self.adjustYoffset(125):self.adjustYoffset(155), 250:670]screen[self.adjustYoffset(48):self.adjustYoffset(98), 675:720]
     #test.getTemplate(327 - 50, 327, 641 - 100,641 + 100, True)
+    test.fameLoop("QWEASDZXC123", "lol", "lol2") #610-945    y 50-440
+    #if test.scanThisROI(test.templateDict['communityicon'], 50,440,610,945 ,0.8, True):
+    #    print("yeah we found baby")
+    #    print(test.matchCoords.xyLoc) #x = 24 | + 610, y = 355 | + 50
+
     #test.botLoop(0, True)
     #test.getTemplate(263,288,290,337, False) x 208-450  145-370 y 
-    test.checkKickSave()
-    test.getTemplate(368,410,728,765, True)#263,288,295,309, False)
-    test.currAmtAB()
+    #test.checkKickSave()
+    #test.getTemplate(368,410,728,765, True)#263,288,295,309, False)
+    #test.currAmtAB()
     #test.dbConn.updateSingleVar("MAIN_TBL_CLIENTS", "accDataRegistered", (1,))
         
     #while 1:

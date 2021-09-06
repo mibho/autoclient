@@ -16,6 +16,7 @@ from Constants import *
 from Constants import keyCodes
 import Coords
 import processTools
+from dumpsysparse import dumpsysparser
 #--------------------------------------s
 
 class cBotTools:
@@ -36,7 +37,8 @@ class cBotTools:
 
         self.afkTimerStarted = False
         self.popupDetected = False
-        
+        self.inputDevicePath = "sendevent " + self.getPathString()
+
         print("cBotTools init success; end of ctor")
     
     def returnColorSS(self, colormode):
@@ -118,7 +120,9 @@ class cBotTools:
     def adjustYoffset(self, yC):
         return yC + 33
 
-
+    def enterText(self, content):
+        event_string = "input text " + content 
+        self.device.shell(event_string)
     
 
     def getTemplateRet(self, minY, maxY, minX, maxX, n):
@@ -133,10 +137,15 @@ class cBotTools:
             cv.imwrite(name, roi)
             print("captured " + str(x))
         time.sleep(1)
+    
+    def getPathString(self):
+        x = dumpsysparser(self.device.shell("dumpsys input"))
+
+        return x.findPathString() + " "
 
     def sendKeyCMD(self, whatKeyCode, onOrOff):
-        completeCMD = keyConstants.SEND_EVENTCMD + eventType.EV_KEYPRESS + " " + whatKeyCode \
-                        + " " + onOrOff + keyConstants.SEND_EVENTCMD + keyConstants.CONFIRM_CMD
+        completeCMD = self.inputDevicePath + eventType.EV_KEYPRESS + " " + whatKeyCode \
+                        + " " + onOrOff + self.inputDevicePath + keyConstants.CONFIRM_CMD
         self.device.shell(completeCMD)
     
     def toggleKeyCMD(self, whatKeyCode):
@@ -148,20 +157,20 @@ class cBotTools:
             x = y = 0
             mCMD = ""
         else:
-            mCMD = keyConstants.SEND_EVENTCMD + " 3 48 5 ;"
-        queueCMD = keyConstants.SEND_EVENTCMD + eventType.EV_KEYPRESS + keyCodes.TOUCH_KEY + " " + onOrOff + " ;"
-        pressXCMD = keyConstants.SEND_EVENTCMD + eventType.EV_INPUT + inputCodes.TOUCH_COORD_X + str(x) + " ;"
-        pressYCMD = keyConstants.SEND_EVENTCMD + eventType.EV_INPUT + inputCodes.TOUCH_COORD_Y + str(y) + " ;"
-        confirmCMD = keyConstants.SEND_EVENTCMD + keyConstants.TOUCH_CONFIRM_CMD \
-                    + keyConstants.SEND_EVENTCMD + keyConstants.CONFIRM_CMD
+            mCMD = self.inputDevicePath + " 3 48 5 ;"
+        queueCMD = self.inputDevicePath + eventType.EV_KEYPRESS + keyCodes.TOUCH_KEY + " " + onOrOff + " ;"
+        pressXCMD = self.inputDevicePath + eventType.EV_INPUT + inputCodes.TOUCH_COORD_X + str(x) + " ;"
+        pressYCMD = self.inputDevicePath + eventType.EV_INPUT + inputCodes.TOUCH_COORD_Y + str(y) + " ;"
+        confirmCMD = self.inputDevicePath + keyConstants.TOUCH_CONFIRM_CMD \
+                    + self.inputDevicePath + keyConstants.CONFIRM_CMD
         
         completeCMD = queueCMD + pressXCMD + pressYCMD + mCMD + confirmCMD
        #print(completeCMD)
         self.device.shell(completeCMD)
     
     def sendResetCMD(self):
-        confirmCMD = keyConstants.SEND_EVENTCMD + keyConstants.TOUCH_CONFIRM_CMD \
-                    + keyConstants.SEND_EVENTCMD + keyConstants.CONFIRM_CMD
+        confirmCMD = self.inputDevicePath + keyConstants.TOUCH_CONFIRM_CMD \
+                    + self.inputDevicePath + keyConstants.CONFIRM_CMD
         self.device.shell(confirmCMD)
     
     def inputTap(self, xC1, xC2, yC1, yC2, delay):

@@ -218,6 +218,14 @@ class cBotFunctionsTools(cBotTools, cBotData):
             return True
         
         return False
+    
+    def closePlayStoreReview(self):
+        while self.scanThisROI(self.templateDict['psreviewicon'],101,160,74,129,0.8, True):
+            print("PlayStore review detected")
+            if self.scanThisROI(self.templateDict['exitreviewbtn'],420,485,60,476,0.8, True):
+                print("exit button found, pressing...")
+                self.sendTimedTap(170,377, 438,475, keyConstants.SHORT_TAP_DURATION)
+            BotTools.time.sleep(2)
 
     def closeAnyLobbyPopup(self):
         if self.scanWindow2(self.templateDict['exitpic'], 0.9) or self.scanWindow2(self.templateDict['exitpic2'], 0.9):
@@ -252,8 +260,9 @@ class cBotFunctionsTools(cBotTools, cBotData):
         thresh11 = cv.erode(thresh11, None, iterations=2)
         thresh11 = cv.dilate(thresh11, None, iterations=4)
         ok = cv.findNonZero(thresh11)
-        avg = np.average(ok, axis = 0)
-        self.whichCharSelected2(avg)
+        if type(ok) is not type(None):
+            avg = np.average(ok, axis = 0)
+            self.whichCharSelected2(avg)
 
 
 
@@ -567,7 +576,7 @@ class cBotFunctionsTools(cBotTools, cBotData):
                 pass
     
     def whichSkillTab(self):
-        roi = self.grabROIColor(71,534,30,95)
+        roi = self.grabROI(71,534,30,95, 1)
         hsv = cv.cvtColor(roi, cv.COLOR_BGR2HSV)
         mask = cv.inRange(hsv,(5,50,50), (15, 255, 255) )
         mm = cv.findNonZero(mask)
@@ -602,7 +611,7 @@ class cBotFunctionsTools(cBotTools, cBotData):
 
     
     def forcedQtest(self): #replace forcedtut with this
-        roi = self.grabROIColor(220,330,195,815)
+        roi = self.grabROI(220,330,195,815, 1)
         hsv = cv.cvtColor(roi, cv.COLOR_BGR2HSV)
         mask = cv.inRange(hsv,(5,25,50), (25, 255, 255) )
         mm = cv.findNonZero(mask)
@@ -735,7 +744,11 @@ class cBotFunctionsTools(cBotTools, cBotData):
         #by default it grabs gray ROIs
     def scanThisROI(self, temp, y1,y2,x1,x2 ,threshold, ptsneeded):
         filteredPic = self.checkForPopups()
-        if not self.popupDetected:
+        if self.popupDetected:
+            self.toggleKeyCMD(keyCodes.ESC_KEY)
+            print("Esc toggled; popup closed?")
+            
+        else:
             roi = filteredPic[self.adjustYoffset(y1):self.adjustYoffset(y2), x1 : x2]
             res = cv.matchTemplate(roi ,temp, eval('cv.TM_CCOEFF_NORMED')) #cv.TM_CCOEFF_NORMED
             loc = np.where( res >= threshold)
@@ -752,13 +765,8 @@ class cBotFunctionsTools(cBotTools, cBotData):
     def checkStage(self):
         screen = self.returnColorSS(False)
         homeStage = cv.matchTemplate(screen, self.templateDict['SCHK_0atHomeScreen'], eval('cv.TM_CCOEFF_NORMED'))
-        crashMsg = cv.matchTemplate(screen, self.templateDict['msmstoppedmsgbox'], eval('cv.TM_CCOEFF_NORMED'))
-        if np.amax(crashMsg > self.DEFAULT_THRESHOLD):
-            self.errorMsgFound = True
-        else:
-            self.errorMsgFound = False
 
-        if np.amax(homeStage) > self.DEFAULT_THRESHOLD or np.amax(crashMsg) > self.DEFAULT_THRESHOLD:
+        if np.amax(homeStage) > self.DEFAULT_THRESHOLD:
             self.gameState.toggleOtherStatesOff(stateConstants.L0_at_home_scr)
         else: #not home screen so in game or buggd
             if not (self.gameState.currState[stateConstants.L5_ingame]):
@@ -824,8 +832,8 @@ class cBotFunctionsTools(cBotTools, cBotData):
                 elif loadingPageVisible and not (stageTitleServerIconVisible or stageTitleRegionVisible):
                     self.gameState.toggleOtherStatesOff(stateConstants.L3_load_entering_game)
                     if self.gameState.startPressed:
-                        self.gameState.toggleOtherStatesOff(stateConstants.L5_ingame)
-                        print("made it! we in game baby")
+                        self.gameState.loadPass = True
+                        
                     self.gameState.atLobby = False
                     #elif self.gameState.goingBackToLobby:
                     #    self.gameState.toggleOtherStatesOff(stateConstants.L4_at_char_lobby)                
@@ -837,6 +845,10 @@ class cBotFunctionsTools(cBotTools, cBotData):
                 else:
                     if not self.gameState.atLobby:
                         self.gameState.toggleOtherStatesOff(stateConstants.L16_loading_wait)
+
+                        if self.gameState.startPressed and self.gameState.loadPass:
+                            self.gameState.toggleOtherStatesOff(stateConstants.L5_ingame)
+                            print("made it! we in game baby") 
                     #if start button was pressed then we going in game
             
                 
@@ -921,3 +933,98 @@ class cBotFunctionsTools(cBotTools, cBotData):
             self.popupDetected = False
 
         return screen
+    
+
+    def fameIsUsed(self):
+        roi = self.grabROI(70,120,618,670,1)
+        hsv = cv.cvtColor(roi, cv.COLOR_BGR2HSV)
+        mask = cv.inRange(hsv,(5,50,50), (15, 255, 255) )
+        mm = cv.findNonZero(mask)
+        #cv.imshow("oj", mask)
+        #cv.waitKey(0)
+
+        if mm is None:
+            return True
+        return False #false if not famed, true if famed
+    
+    def enterSubMenu(self, tempName):
+        
+        state = self.checkIfInMenu()
+
+        while state:#610-945    y 50-440
+            print("in enterSubMenu() while loop")
+            if self.scanThisROI(self.templateDict[tempName],50, 440, 610, 945, 0.85, True):
+                print("in enterSubMenu() while loop sending touch")
+                topLCX = self.matchCoords.xyLoc[0] + 610
+                topLCY = self.matchCoords.xyLoc[1] + 50
+                xMax = topLCX + 30
+                yMax = topLCY + 20
+                self.sendTimedTap(topLCX, xMax, topLCY, yMax, keyConstants.SHORT_TAP_DURATION)
+                print("touch sent; 3 sec sleep")
+                BotTools.time.sleep(3)
+                print("done sleepin")
+            state = self.checkIfInMenu() 
+        
+    
+    def checkIfRightSubMenu(self, subMenuName):
+        if self.scanThisROI(self.templateDict[subMenuName], 13,53,5,280, 0.8, True):
+            print("in right one")
+            return True
+        return False
+
+    def openInGameMenu(self):
+        if self.scanThisROI(self.templateDict['newmenuicon'],7,47,900, 954, 0.83, True):    #growrthevent scan area y: 134-200 x:10,143
+            minX = 900 + self.matchCoords.xyLoc[0] + 5
+            maxX = minX + 20
+            minY = 7 + self.matchCoords.xyLoc[1] + 5
+            maxY = minY + 15
+            self.sendTimedTap(minX,maxX,minY,maxY, keyConstants.SHORT_TAP_DURATION)
+            print(minX, maxX, minY, maxY)
+            BotTools.time.sleep(3)
+
+    def checkIfInMenu(self):
+        if self.scanThisROI(self.templateDict['inmenucheck'],475,515,905, 945, 0.83, True):
+            print("menu icon spotted! still in menu")
+            return True
+        
+        print("not in ingamemenu icon not spotted")
+        return False
+
+    def scanAndPressDungMenu(self, dungName, expectedPage):
+        if self.scanThisROI(self.templateDict[dungName],111,535,3, 957, 0.83, True):
+            while not self.checkIfRightSubMenu(expectedPage):
+                minX = 3 + self.matchCoords.xyLoc[0] + 5
+                maxX = minX + 110
+                minY = 111 + self.matchCoords.xyLoc[1] + 10
+                maxY = minY + 150
+                self.sendTimedTap(minX,maxX,minY,maxY, keyConstants.SHORT_TAP_DURATION)
+                BotTools.time.sleep(3)
+            print("yay we got to it")
+
+    def confirmDungABOn(self):
+        if self.scanThisROI(self.templateDict['dungabon'], 5,56,285,400, 0.8, True):
+            return 0
+        else:
+            if self.scanThisROI(self.templateDict['dungaboff'], 5,56,285,400, 0.8, True):
+                return 1
+                
+        
+        return -2 #not in right place so exit
+        
+
+    def goToPage(self, subMenuIcon, subMenuLoc, pageName):
+        if self.checkIfRightSubMenu(pageName):
+            return True
+        else:
+            if not self.checkIfInMenu():
+                self.openInGameMenu()
+            while not self.checkIfRightSubMenu(pageName):
+                if self.checkIfInMenu():
+                    self.enterSubMenu(subMenuIcon, subMenuLoc)
+            if self.checkIfRightSubMenu(pageName):
+                print("succ")
+                return True
+            else:
+                        
+                print("nah smthin happened")
+                return False

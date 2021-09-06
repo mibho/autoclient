@@ -11,14 +11,14 @@ class cBotData:
         self.templateDict = {
 
             #stageCheck() function template files
-            'SCHK_0atHomeScreen'   : cv.imread('sCHK_0atHomeScreen2.png', 0),
+            'SCHK_0atHomeScreen'   : cv.imread('SCHK_0atHomeScreen.png', 0),
             'SCHK_1exitbanner'   : cv.imread('SCHK_1exitbanner.png', 0),
             'SCHK_vivoxTitleRegion'   : cv.imread('SCHK_vivoxTitleRegion.png', 0), #820-930 X | 400-510 Y
             'SCHK_12newTitleRegion' : cv.imread('SCHK_12newTitleRegion.png', 0), #10-45 x     492-523 y
             'SCHK_12titleScreen'   : cv.imread('SCHK_12titleScreen.png', 0), 
             'SCHK_1roiTitleInosys'   : cv.imread('SCHK_1roiTitleInosys.png', 0), 
             'SCHK_20roiTitleCharDetected' : cv.imread('SCHK_20roiTitleCharDetected.png', 0),
-            'SCHK_30loadingPage' : cv.imread('SCHK_302loadingPage.png', 0), 
+            'SCHK_30loadingPage' : cv.imread('SCHK_30loadingPage.png', 0), 
             'SCHK_40charStart' : cv.imread('SCHK_40charStart.png', 0),  
             'bannerexit2' : cv.imread('bannerexit2.png', 0),  
 
@@ -244,8 +244,32 @@ class cBotData:
             'questavail' : cv.imread('questavail.png', 0),
             'xenonshipmenu' : cv.imread('xenonshipmenu.png', 0),
             'regquestarrow'  : cv.imread('regquestarrow.png',0),
+
+            'psreviewicon' : cv.imread('psreviewicon.png', 0),
+            'exitreviewbtn' : cv.imread('exitreviewbtn.png', 0),
+
+            'bottom_left_skillbtn' : cv.imread('bottom_left_skillbtn.png', 0),
+            'communityicon' : cv.imread('communityicon.png', 0),
+            'communitypage' : cv.imread('communitypage.png', 0),
+            'searchplayersbtn' : cv.imread('searchplayers.png', 0),
+            'searchplayersbox' : cv.imread('searchplayersbox.png', 0),
+            'emptynamebox' : cv.imread('emptynamebox.png', 0),
+            'confirmbtn' : cv.imread('confirmbtn.png', 0),
+            'searchresults' : cv.imread('searchresults.png', 0),
+            'playerinfopage' : cv.imread('playerinfopage.png', 0),
+
+            'newmenuicon' : cv.imread('newmenuicon.png', 0),
+            'inmenucheck' : cv.imread('inmenucheck.png', 0),
                  }
         page_elite_dung = ['']                   
         self.pageInfoDict = {
 
         }
+'''
+
+            #ROI of weekly mission tasks (all): 171- 698 x |  121,376 y 
+            # top half Y: 121,246. bottom half Y: 255,376 mailconfirmreward
+            
+                #press y| 473,493 x| 136,390
+            
+'''

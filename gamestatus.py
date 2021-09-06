@@ -1,4 +1,3 @@
-
 from Constants import stateConstants
 
 
@@ -25,6 +24,7 @@ class GameStatus:
         self.distanceGrabbed = False
         self.startPressed = False
         self.goingBackToLobby = False
+        self.loadPass = False
 
         self.crashed = False
         self.charLocated = False

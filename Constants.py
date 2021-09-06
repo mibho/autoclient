@@ -59,7 +59,7 @@ class stateConstants:
     L7_collect_week_rewards      = 7    #getting all stuff from achievements
     L8_daily_dung                 = 8
     L9_elite_dung                = 9
-    L10_netts                    = 10
+    L10_auto_fame                = 10
     L11_mini_dung                = 11
     L12_exped_leech              = 12
     L13_auto_quest               = 13
@@ -136,12 +136,15 @@ class cMenuOption:
     
 
 class gameConstants:        #in same order as game, ie: 1st/top-most item is phydmg buff, 2nd is bossatt, 3rd is meso, etc
-    NOT_FOUND =             -3 
-    TANG_YOON_PHYDMG =      ('phydmgtang.png', 0)
-    TANG_YOON_BOSSATT =     ('bossattacktang.png', 1)
-    TANG_YOON_MESO =        ('mesoxptang.png', 2)
-    TANG_YOON_MAGDMG =      ('magdmgtang.png', 3)
-    TANG_YOON_CRITRATE =    ('critratetang.png', 4)
+    
+    DAILY_FAME_LIMIT        = 10
+
+    NOT_FOUND               = -3 
+    TANG_YOON_PHYDMG        = ('phydmgtang.png', 0)
+    TANG_YOON_BOSSATT       = ('bossattacktang.png', 1)
+    TANG_YOON_MESO          = ('mesoxptang.png', 2)
+    TANG_YOON_MAGDMG        = ('magdmgtang.png', 3)
+    TANG_YOON_CRITRATE      = ('critratetang.png', 4)
 
     TANG_YOON_PREV_OPTION = 5 #DIR = LEFT
     TANG_YOON_NEXT_OPTION = 6 #DIR = RIGHT
