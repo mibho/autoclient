@@ -33,7 +33,9 @@ class cBotFunctions(cBotFunctionsTools):
         self.gplayPressedPlayed = False
         self.patchSuccess = False
         self.inputAccData = False
-        self.reScanLobbyData = False # toggle 
+        self.reScanLobbyData = False # toggle
+        self.charsToFame = 0
+        self.totalChars = 0
         self.dbDataCheck()
     
     def dbDataCheck(self):
@@ -91,15 +93,26 @@ class cBotFunctions(cBotFunctionsTools):
         with open(filename, encoding= 'utf-8') as nameList:
             tempList = nameList.readlines()
         
+        self.charsToFame = len(tempList)
         data_tup = tuple(name.rstrip('\n') for name in tempList)
 
-        return str(data_tup)
+        return data_tup
+    
+    def listOfZeros(self, length):
+        return [0] * length
+    
+    def listToTuple(self, length):
+        return tuple(self.listOfZeros(length))
+
 
     def initFameDB(self):
         tbl_name = "fameTable" + str(self.dbConn.noxNum)
         if not self.dbConn.doesTableExist(tbl_name):    #if tbl doesnt exist, lets set it up
             names = self.getNamesFromFile('fameNames.txt')
-            self.dbConn.createTableIfDNE(tbl_name, 1, names)
+            input = ('charNum',) + names
+            self.dbConn.createTableIfDNE(tbl_name, 1, str(input))
+            data_tuple = self.listToTuple(self.charsToFame)
+            self.dbConn.registerFameAccData(names, data_tuple, self.totalChars)
             # get char names from user input in pyqt (user enters 10 names, those are read in. store data after)
         else:
             pass
@@ -238,9 +251,10 @@ class cBotFunctions(cBotFunctionsTools):
                     while not done:
                         self.closeAnyLobbyPopup()
                         if self.gameState.returnStageNum() == stateConstants.L4_at_char_lobby:
-                            charAmt = self.countEmptySlots()
-                            for x in range(0, charAmt):
+                            self.totalChars = self.getCharLobbyData()
+                            for x in range(0, self.totalChars):
                                 self.dbConn.registerClientAccData(x)
+                            self.initFameDB()
                             self.dbConn.updateSingleVar("MAIN_TBL_CLIENTS", "accDataRegistered", (1,) )
                             done = True
                             self.inputAccData = False

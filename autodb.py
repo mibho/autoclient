@@ -13,6 +13,7 @@ class clientDB:
     UTC_7_TZ = "America/Los Angeles"
     UTC_8_TZ = "America/Juneau"
     CHAR_TBL_TITLE = "charTable"
+    FAME_TBL_TITLE = "fameTable"
     #CREATE_MAIN_TABLE_CMD = "CREATE TABLE IF NOT EXISTS MAIN_CLI_TBL (clientID INTEGER PRIMARY KEY, clientName TEXT NOT NULL, botLastOpened timestamp);"
     #CREATE_CLIENT_CHAR_TABLE_CMD =  "CREATE TABLE IF NOT EXISTS " + tableName + " (clientID INTEGER PRIMARY KEY, clientName TEXT NOT NULL, botLastOpened timestamp);"
 
@@ -121,6 +122,17 @@ class clientDB:
         self.executeCMD(sqlCMD)
         print(len(self.sqlCursor.fetchall()))
         print("TOTAL")
+
+    def registerFameAccData(self,names, data_tuple, numChars):
+        table = self.FAME_TBL_TITLE + str(self.noxNum)
+        prefix = ('charNum',)
+        t1 = prefix + names
+        print(type(t1))
+        print(t1)
+        for x in range(0, numChars):
+            t2 = (x,) + data_tuple
+            self.insertOrUpdateMultiple(table, str(t1), t2)
+        
 
     def registerClientAccData(self,charNum):
         table = self.CHAR_TBL_TITLE + str(self.noxNum)
