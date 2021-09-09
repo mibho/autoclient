@@ -34,7 +34,8 @@ if __name__ == '__main__':
     #    print(test.matchCoords.xyLoc[1] + 405)
     #    test.OOG_forceCloseMapleApp()#[self.adjustYoffset(125):self.adjustYoffset(155), 250:670]screen[self.adjustYoffset(48):self.adjustYoffset(98), 675:720]
     #test.getTemplate(327 - 50, 327, 641 - 100,641 + 100, True)
-    test.fameLoop("QWEASDZXC123", "lol", "lol2") #610-945    y 50-440
+    #test.fameLoop("QWEASDZXC123", "lol", "lol2") #610-945    y 50-440
+    test.initFameDB()
     #if test.scanThisROI(test.templateDict['communityicon'], 50,440,610,945 ,0.8, True):
     #    print("yeah we found baby")
     #    print(test.matchCoords.xyLoc) #x = 24 | + 610, y = 355 | + 50

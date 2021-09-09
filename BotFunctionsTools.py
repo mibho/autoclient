@@ -173,7 +173,7 @@ class cBotFunctionsTools(cBotTools, cBotData):
         else:
             print("ruh roh error")
 
-    def countEmptySlots(self):
+    def returnCharAmtOnPage(self):
         roi = self.grabROI(82,483,73,645, False)
         count = 0
         
@@ -263,6 +263,49 @@ class cBotFunctionsTools(cBotTools, cBotData):
         if type(ok) is not type(None):
             avg = np.average(ok, axis = 0)
             self.whichCharSelected2(avg)
+    
+    def whichCharPage(self):
+        roi = self.grabROI(483,506,285,440, 1) #285-440             483-506
+        hsv = cv.cvtColor(roi, cv.COLOR_BGR2HSV)
+        mask = cv.inRange(hsv,(5,50,50), (7, 175, 255) )
+        mm = cv.findNonZero(mask)
+        avg = np.average(mm, axis = 0) #71 corresponds to y starting point of ROI so have to adjust for it [since everything done w/ respect to (0,0)]
+        selectedTab = avg[0][0] + 285
+        #cv.imshow("oj", mask)
+        #cv.waitKey(0)
+        print(type(avg))
+        print(selectedTab)
+        if selectedTab >= 290 and selectedTab <= 315:
+            print("pg 1")
+            return 1
+        elif selectedTab >= 317 and selectedTab <= 335:
+            print("pg2 ")
+            return 2
+        elif selectedTab >= 340 and selectedTab <= 355:
+            print("pg3 ")
+            return 3
+        elif selectedTab >= 365 and selectedTab <= 380:
+            print("pg4 ")
+            return 4
+        elif selectedTab >= 385 and selectedTab <= 400:
+            print("pg5 ")
+            return 5
+        elif selectedTab >= 408 and selectedTab <= 423:
+            print("last page")
+            return 6
+        
+        return -1 #ruh roh
+    
+    def movePage(self, leftOrRight): #630-645 x 260-280 y ->         36-51 x       256-281 y   
+        if leftOrRight == 0:
+            self.sendTimedTap(36,51, 256,281, keyConstants.SHORT_TAP_DURATION) #0 = left
+
+        elif leftOrRight == 1:
+            self.sendTimedTap(630,645, 260,280, keyConstants.SHORT_TAP_DURATION)
+
+        else:
+            print("lol this shouldnt print")      
+
 
 
 

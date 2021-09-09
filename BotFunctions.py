@@ -33,6 +33,7 @@ class cBotFunctions(cBotFunctionsTools):
         self.gplayPressedPlayed = False
         self.patchSuccess = False
         self.inputAccData = False
+        self.reScanLobbyData = False # toggle 
         self.dbDataCheck()
     
     def dbDataCheck(self):
@@ -53,10 +54,52 @@ class cBotFunctions(cBotFunctionsTools):
                 print("OH NO SOMETHING BIG WRONG BIG BIG WRONG")
                 print("HELP!")
                 print("---------------------------------------")
+            self.inputAccData = False
     
+    def getCharLobbyData(self):
+        #make sure in char select lobby.. do on first run only?
+        currPage = -1
+        total = -1
+        first = False
+        while currPage != 1:
+            currPage = self.whichCharPage()
+            if currPage != 1:
+                if currPage <= 3:
+                    self.movePage(0) #move left
+                else:
+                    self.movePage(1)
+            else:
+                print("we are on page 1. continuing...")
+                first = True
+
+        while first == True or total == 7:
+            total = self.returnCharAmtOnPage()
+            if total == 7:
+                self.movePage(1)
+                first = False
+        currPage = self.whichCharPage()
+
+        if currPage != 1: 
+            amt = total
+            total = (currPage - 1) * 7
+            total += amt
+        
+        print("ok so total is: " + str(total))
+        return total
+    
+    def getNamesFromFile(self, filename):
+        with open(filename, encoding= 'utf-8') as nameList:
+            tempList = nameList.readlines()
+        
+        data_tup = tuple(name.rstrip('\n') for name in tempList)
+
+        return str(data_tup)
+
     def initFameDB(self):
-        if not self.dbConn.doesTableExist("fameTable"):
-            self.dbConn.createTableIfDNE("fameTable")
+        tbl_name = "fameTable" + str(self.dbConn.noxNum)
+        if not self.dbConn.doesTableExist(tbl_name):    #if tbl doesnt exist, lets set it up
+            names = self.getNamesFromFile('fameNames.txt')
+            self.dbConn.createTableIfDNE(tbl_name, 1, names)
             # get char names from user input in pyqt (user enters 10 names, those are read in. store data after)
         else:
             pass

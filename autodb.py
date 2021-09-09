@@ -23,11 +23,11 @@ class clientDB:
         self.initMainTable()
         self.dailyReset = False
         self.reobtainCharInfo = False #have this be like a checkbox setting; enabled if user clicks button or something for gui pt later...
-        self.checkIfDataRegistered(self.noxNum)
+        #self.checkIfDataRegistered(self.noxNum)
         #self.getNumberOfEntries()
         self.resetDailyStatus()
         self.registerClientInMain()
-        print("apsted")
+        print("clientDB object created.")
 
     
     def connectToDB(self, dbFileName):
@@ -71,9 +71,21 @@ class clientDB:
 
         return (self.sqlCursor.fetchone() is not None)
 
+    '''
+    createTableIfDNE absolute shitfest of a func; need rewrite
+    2 ways to call:
+        1) createTableIfDNE(tableName, tupleNeeded, dataTuple) which takes name of the table(string), 1 (if tuple not needed, else omit), tuple w/ data.
+        2) createTableIfDNE(tableName, dataTuple) 
+        difference being dataTuple in 2nd call requires caller to add parentheses. [alr included in 1)]
+    '''
     def createTableIfDNE(self, *args): #args[0] = tbl_name, args[1] = column contents of tbl
-        sqlCMD = "CREATE TABLE IF NOT EXISTS "+ args[0] + " (" + args[1] + ");"
-        self.executeCMD(sqlCMD)
+        if args[1] == 1: #tuple not needed
+            sqlCMD = "CREATE TABLE IF NOT EXISTS "+ args[0] + " " + args[2] + ";"
+            self.executeCMD(sqlCMD)
+        else:
+            sqlCMD = "CREATE TABLE IF NOT EXISTS "+ args[0] + " (" + args[1] + ");"
+            self.executeCMD(sqlCMD)
+        
     
     def resetDailyStatus(self):
         print("ENTERING RESETDAILY")
@@ -102,7 +114,7 @@ class clientDB:
 
                                         #  0        1               2               3                   4               5               6           7           8
     def createClientAccDataTable(self, clientTitle): #char# | jobs done? | ed tix take? | daily dung done? | elite dung done? | netts dung done? | ab taken? | can take AB | TY done
-        self.createTableIfDNE(clientTitle, "charNum INTEGER PRIMARY KEY, charDone INTEGER, extraEDTixTaken INTEGER, dailyDungDone INTEGER, eliteDungDone INTEGER, nettsDungDone INTEGER, dailyABTaken INTEGER, dailyABAvail INTEGER, cookDungDone INTEGER")
+        self.createTableIfDNE(clientTitle, "charNum INTEGER PRIMARY KEY, charDone INTEGER, extraEDTixTaken INTEGER, dailyDungDone INTEGER, eliteDungDone INTEGER, nettsDungDone INTEGER, dailyABTaken INTEGER, dailyABAvail INTEGER, cookDungDone INTEGER, allFamed INTEGER")
 
     def getNumOfClientsRegistered(self):
         sqlCMD = "SELECT * FROM MAIN_TBL_CLIENTS"
@@ -112,8 +124,8 @@ class clientDB:
 
     def registerClientAccData(self,charNum):
         table = self.CHAR_TBL_TITLE + str(self.noxNum)
-        data_tuple = (charNum, 0, 0, 0, 0, 0, 0, 0, 0)
-        self.insertOrUpdateMultiple(table,"(charNum, charDone, extraEDTixTaken, dailyDungDone, eliteDungDone, nettsDungDone, dailyABTaken, dailyABAvail, cookDungDone )", data_tuple)
+        data_tuple = (charNum, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        self.insertOrUpdateMultiple(table,"(charNum, charDone, extraEDTixTaken, dailyDungDone, eliteDungDone, nettsDungDone, dailyABTaken, dailyABAvail, cookDungDone, allFamed )", data_tuple)
     #return -1 if entry DNE, ie, current clientID isn't even in main table... otherwise return 0 or 1.
     #                                                                         returns 0 by default [not registered], 1 if we obtained acc data via char lobby already.
     def checkIfDataRegistered(self, cID):
