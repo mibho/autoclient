@@ -1,3 +1,14 @@
+06/22/23 - basically abandoned project and making it public. it's all scuffed and idk if it even works... 
+
+any "useful" tidbits will be in:
+    1) dumpsysparse
+    2) processTools
+    3) BotTools
+and maybe NoxClientHandler and NoxClientManager
+
+hope this helps anyone interested in automating stuff via adb :)
+
+--------------------------------------------------------------------------------------------------------------
 # autoclient
 WIP 1st push
 
